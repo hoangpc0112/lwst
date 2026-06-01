@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { ScrapedServer } from "@/lib/cpt-hedge";
 
-type Language = "vi" | "en";
+type Language = "vi" | "en" | "zh";
 
 type DashboardProps = {
   anchorServer: ScrapedServer;
@@ -39,6 +39,7 @@ type Copy = {
   languageLabel: string;
   vietnamese: string;
   english: string;
+  chinese: string;
   serverAnchorSeason: string;
 };
 
@@ -70,6 +71,7 @@ const COPY: Record<Language, Copy> = {
     languageLabel: "Ngôn ngữ",
     vietnamese: "Tiếng Việt",
     english: "English",
+    chinese: "繁體中文",
     serverAnchorSeason: "Season của server 1927",
   },
   en: {
@@ -99,12 +101,44 @@ const COPY: Record<Language, Copy> = {
     languageLabel: "Language",
     vietnamese: "Tiếng Việt",
     english: "English",
+    chinese: "繁體中文",
     serverAnchorSeason: "Server 1927 season",
+  },
+  zh: {
+    heroKicker: "快速篩選面板",
+    heroTitleBefore: "與",
+    heroTitleHighlight: "#1927",
+    heroTitleAfter: "相同賽季且具有閃耀任務的伺服器。",
+    heroDescription: "顯示與 1927 相同賽季且目前處於閃耀任務週期的伺服器。",
+    statTotal: "總伺服器數",
+    statSeason: "相同賽季",
+    statShiny: "閃耀任務",
+    anchorTitle: "錨點伺服器",
+    seasonLabel: "賽季",
+    dayLabel: "Day",
+    regionLabel: "地區",
+    shinyLabel: "閃耀任務",
+    resultsTitle: "符合結果",
+    resultsDescription: "僅顯示與 #1927 同賽季且目前處於閃耀任務週期的伺服器，方便行動裝置快速檢視。",
+    resultsCount: "符合數量",
+    tableServer: "伺服器",
+    tableSeason: "賽季",
+    tableDay: "Day",
+    tableRegion: "地區",
+    tableUpdated: "更新時間",
+    emptyState: "沒有伺服器符合此篩選。",
+    languageLabel: "語言",
+    vietnamese: "Tiếng Việt",
+    english: "English",
+    chinese: "繁體中文",
+    serverAnchorSeason: "伺服器 1927 的賽季",
   },
 };
 
 function formatDate(timestamp: number, language: Language) {
-  return new Intl.DateTimeFormat(language === "vi" ? "vi-VN" : "en-US", {
+  const locale = language === "vi" ? "vi-VN" : language === "zh" ? "zh-TW" : "en-US";
+
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(timestamp));
@@ -125,18 +159,19 @@ function formatServerLabel(server: {
   isPostSeason: boolean;
   currentWeek?: number;
 }, language: Language) {
-  const seasonText = language === "vi" ? "Season" : "Season";
+  const seasonText = language === "vi" ? "Season" : language === "zh" ? "賽季" : "Season";
 
   if (!server.currentSeason) {
     return `${seasonText} 0`;
   }
 
   if (server.isPostSeason) {
+    const postSeason = language === "vi" ? "Hậu mùa" : language === "zh" ? "後賽季" : "Post-season";
+    const weekLabel = language === "vi" ? "tuần" : language === "zh" ? "週" : "week";
+
     return server.currentWeek
-      ? `${seasonText} ${server.currentSeason} - ${language === "vi" ? "Hậu mùa" : "Post-season"} ${
-          language === "vi" ? "tuần" : "week"
-        } ${server.currentWeek}`
-      : `${seasonText} ${server.currentSeason} - ${language === "vi" ? "Hậu mùa" : "Post-season"}`;
+      ? `${seasonText} ${server.currentSeason} - ${postSeason} ${weekLabel} ${server.currentWeek}`
+      : `${seasonText} ${server.currentSeason} - ${postSeason}`;
   }
 
   return server.currentWeek
@@ -165,6 +200,15 @@ function LanguageToggle({ language, setLanguage, copy }: { language: Language; s
       >
         {copy.english}
       </button>
+      <button
+        type="button"
+        onClick={() => setLanguage("zh")}
+        className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+          language === "zh" ? "bg-amber-400 text-slate-950 shadow" : "text-slate-300 hover:text-white"
+        }`}
+      >
+        {copy.chinese}
+      </button>
     </div>
   );
 }
@@ -189,13 +233,19 @@ export default function ServerDashboard({
   useEffect(() => {
     const storedLanguage = window.localStorage.getItem("lwst-language");
 
-    if (storedLanguage === "vi" || storedLanguage === "en") {
-      setLanguage(storedLanguage);
+    if (storedLanguage === "vi" || storedLanguage === "en" || storedLanguage === "zh") {
+      setLanguage(storedLanguage as Language);
       return;
     }
 
     const browserLanguage = navigator.language.toLowerCase();
-    setLanguage(browserLanguage.startsWith("vi") ? "vi" : "en");
+    if (browserLanguage.startsWith("vi")) {
+      setLanguage("vi");
+    } else if (browserLanguage.startsWith("zh")) {
+      setLanguage("zh");
+    } else {
+      setLanguage("en");
+    }
   }, []);
 
   useEffect(() => {
@@ -225,9 +275,9 @@ export default function ServerDashboard({
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
-            <MetricCard label={copy.statTotal} value={totalServers.toLocaleString(language === "vi" ? "vi-VN" : "en-US")} />
-            <MetricCard label={copy.statSeason} value={sameSeasonServers.length.toLocaleString(language === "vi" ? "vi-VN" : "en-US")} />
-            <MetricCard label={copy.statShiny} value={sameSeasonWithShinyTask.length.toLocaleString(language === "vi" ? "vi-VN" : "en-US")} />
+            <MetricCard label={copy.statTotal} value={totalServers.toLocaleString(language === "vi" ? "vi-VN" : language === "zh" ? "zh-TW" : "en-US")} />
+            <MetricCard label={copy.statSeason} value={sameSeasonServers.length.toLocaleString(language === "vi" ? "vi-VN" : language === "zh" ? "zh-TW" : "en-US")} />
+            <MetricCard label={copy.statShiny} value={sameSeasonWithShinyTask.length.toLocaleString(language === "vi" ? "vi-VN" : language === "zh" ? "zh-TW" : "en-US")} />
           </div>
         </header>
 
