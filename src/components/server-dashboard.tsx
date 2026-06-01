@@ -40,6 +40,8 @@ type Copy = {
   vietnamese: string;
   english: string;
   chinese: string;
+  exportTopTen: string;
+  exportCopied: string;
   serverAnchorSeason: string;
 };
 
@@ -72,6 +74,8 @@ const COPY: Record<Language, Copy> = {
     vietnamese: "Tiếng Việt",
     english: "English",
     chinese: "繁體中文",
+    exportTopTen: "Copy 10 server gần nhất",
+    exportCopied: "Đã sao chép danh sách 10 server",
     serverAnchorSeason: "Season của server 1927",
   },
   en: {
@@ -102,6 +106,8 @@ const COPY: Record<Language, Copy> = {
     vietnamese: "Tiếng Việt",
     english: "English",
     chinese: "繁體中文",
+    exportTopTen: "Copy nearest 10 servers",
+    exportCopied: "Copied the 10-server list",
     serverAnchorSeason: "Server 1927 season",
   },
   zh: {
@@ -131,6 +137,8 @@ const COPY: Record<Language, Copy> = {
     vietnamese: "Tiếng Việt",
     english: "English",
     chinese: "繁體中文",
+    exportTopTen: "複製最近的 10 個伺服器",
+    exportCopied: "已複製 10 個伺服器的清單",
     serverAnchorSeason: "伺服器 1927 的賽季",
   },
 };
@@ -229,6 +237,7 @@ export default function ServerDashboard({
   totalServers,
 }: DashboardProps) {
   const [language, setLanguage] = useState<Language>("vi");
+  const [exportFeedback, setExportFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     const storedLanguage = window.localStorage.getItem("lwst-language");
@@ -253,6 +262,41 @@ export default function ServerDashboard({
   }, [language]);
 
   const copy = useMemo(() => COPY[language], [language]);
+  const topTenNearestShinyNames = useMemo(() => {
+    const anchorId = Number.parseInt(anchorServer.id, 10);
+
+    return [...sameSeasonWithShinyTask]
+      .filter((server) => server.id !== anchorServer.id)
+      .sort((left, right) => {
+        const leftDistance = Math.abs(Number.parseInt(left.id, 10) - anchorId);
+        const rightDistance = Math.abs(Number.parseInt(right.id, 10) - anchorId);
+
+        if (leftDistance !== rightDistance) {
+          return leftDistance - rightDistance;
+        }
+
+        return Number.parseInt(left.id, 10) - Number.parseInt(right.id, 10);
+      })
+      .slice(0, 10)
+        .sort((left, right) => Number.parseInt(left.id, 10) - Number.parseInt(right.id, 10))
+      .map((server) => server.id);
+  }, [anchorServer.id, sameSeasonWithShinyTask]);
+
+  async function handleExportTopTen() {
+    const payload = topTenNearestShinyNames.join(", ");
+
+    if (!payload) {
+      setExportFeedback(copy.emptyState);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(payload);
+      setExportFeedback(copy.exportCopied);
+    } catch {
+      setExportFeedback(payload);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.18),_transparent_28%),radial-gradient(circle_at_bottom_right,_rgba(56,189,248,0.12),_transparent_24%),linear-gradient(180deg,_#020617_0%,_#07111f_42%,_#0b1220_100%)] text-slate-100">
@@ -271,6 +315,14 @@ export default function ServerDashboard({
               <div className="py-2 text-xs text-slate-300 shadow-sm">
                 <LanguageToggle language={language} setLanguage={setLanguage} copy={copy} />
               </div>
+              <button
+                type="button"
+                onClick={handleExportTopTen}
+                className="inline-flex items-center justify-center rounded-full border border-amber-400/25 bg-amber-400/12 px-4 py-2 text-xs font-semibold text-amber-100 shadow-lg shadow-black/20 transition hover:border-amber-300/40 hover:bg-amber-300/15 hover:text-white"
+              >
+                {copy.exportTopTen}
+              </button>
+              {exportFeedback ? <div className="max-w-xs text-right text-[11px] leading-5 text-slate-400">{exportFeedback}</div> : null}
             </div>
           </div>
 
