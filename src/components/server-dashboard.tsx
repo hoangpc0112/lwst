@@ -233,18 +233,6 @@ export default function ServerDashboard({
 
         <section className="grid gap-4">
           <div className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-slate-950/80 shadow-2xl shadow-black/25 backdrop-blur-xl">
-            <div className="border-b border-white/10 px-4 py-5 sm:px-6">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{copy.resultsTitle}</h2>
-                </div>
-                <div className="py-2 text-sm text-slate-200">
-                  <span className="font-semibold text-white">{sameSeasonWithShinyTask.length}</span>
-                  <span className="ml-2 text-slate-400">{copy.resultsCount}</span>
-                </div>
-              </div>
-            </div>
-
             <div className="hidden grid-cols-[96px_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] gap-0 border-b border-white/10 bg-white/5 px-4 py-4 text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400 md:grid md:px-6">
               <div>{copy.tableServer}</div>
               <div>{copy.tableSeason}</div>
