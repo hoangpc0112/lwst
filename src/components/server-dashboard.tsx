@@ -238,7 +238,7 @@ export default function ServerDashboard({
                 <div>
                   <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{copy.resultsTitle}</h2>
                 </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200">
+                <div className="py-2 text-sm text-slate-200">
                   <span className="font-semibold text-white">{sameSeasonWithShinyTask.length}</span>
                   <span className="ml-2 text-slate-400">{copy.resultsCount}</span>
                 </div>
