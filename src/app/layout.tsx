@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Server cùng season với 1927",
+  title: "Shiny Task Servers",
   description:
     "Trang scrape dữ liệu Last War: Survival từ cpt-hedge.com và lọc các server cùng season với 1927 có shiny task.",
 };
