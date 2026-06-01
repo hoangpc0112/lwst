@@ -218,7 +218,7 @@ export default function ServerDashboard({
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center lg:flex-col lg:items-end">
-              <div className="px-3 py-2 text-xs text-slate-300 shadow-sm">
+              <div className="py-2 text-xs text-slate-300 shadow-sm">
                 <LanguageToggle language={language} setLanguage={setLanguage} copy={copy} />
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function ServerDashboard({
                 <div>
                   <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{copy.resultsTitle}</h2>
                 </div>
-                <div className="inline-flex rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200">
+                <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200">
                   <span className="font-semibold text-white">{sameSeasonWithShinyTask.length}</span>
                   <span className="ml-2 text-slate-400">{copy.resultsCount}</span>
                 </div>
@@ -265,7 +265,10 @@ export default function ServerDashboard({
                       }`}
                     >
                       <div className="flex items-center justify-between md:block">
-                        <div className="font-extrabold tracking-tight text-white">#{server.id}</div>
+                        <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-base font-black tracking-tight text-amber-200 shadow-sm shadow-black/20 md:text-lg">
+                          <span className="text-amber-300">#</span>
+                          <span>{server.id}</span>
+                        </div>
                         <div className="md:hidden rounded-full bg-emerald-400/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
                           {copy.shinyLabel}
                         </div>
